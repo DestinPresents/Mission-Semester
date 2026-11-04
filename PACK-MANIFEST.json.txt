@@ -1,0 +1,26 @@
+{
+  "html_pages": [
+    "msq-math-objective-26.html",
+    "msq-math-short-26.html",
+    "msq-math-descriptive-26.html",
+    "msq-physics-objective-26.html",
+    "msq-physics-short-26.html",
+    "msq-physics-descriptive-26.html",
+    "msq-chem-objective-26.html",
+    "msq-chem-short-26.html",
+    "msq-chem-descriptive-26.html"
+  ],
+  "shared_assets": [
+    "msq-aurora-layout.css",
+    "msq-aurora-engine.js"
+  ],
+  "chapters": {
+    "Mathematics-I": 5,
+    "Applied Physics-I": 7,
+    "Applied Chemistry": 5
+  },
+  "questions_per_type_per_chapter": 10,
+  "total_mcq": 170,
+  "total_short": 170,
+  "total_long": 170
+}
