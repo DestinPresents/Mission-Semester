@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="hi">
 <head>
@@ -5,28 +6,419 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f6f5f1">
 <meta name="description" content="Mission Semester — BTEUP प्रथम सेमेस्टर की पढ़ाई, सिलेबस, टाइमटेबल और दैनिक अध्ययन रिकॉर्ड।">
+
 <link rel="manifest" href="manifest.json">
 <title>Mission Semester</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+/* Mission Semester Question Menu */
+#msqOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(10, 15, 30, .55);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  padding: 12px;
+}
+
+#msqOverlay.msq-open {
+  display: flex;
+}
+
+.msq-panel {
+  width: 100%;
+  max-width: 540px;
+  max-height: 88dvh;
+  overflow-y: auto;
+  background: #f8f8fc;
+  color: #192033;
+  border: 1px solid rgba(255,255,255,.7);
+  border-radius: 25px;
+  padding: 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  box-shadow: 0 20px 70px rgba(0,0,0,.25);
+  animation: msqSlideUp .22s ease-out;
+}
+
+@keyframes msqSlideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.msq-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.msq-header h2 {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.msq-header p {
+  margin: 5px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+#msqClose {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 12px;
+  background: #e9eaf2;
+  color: #20283b;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+.msq-subject {
+  margin-top: 12px;
+  border: 1px solid #e4e6ef;
+  background: #fff;
+  border-radius: 17px;
+  overflow: hidden;
+}
+
+.msq-subject-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 0;
+  background: transparent;
+  color: #20283b;
+  text-align: left;
+  cursor: pointer;
+}
+
+.msq-subject-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 13px;
+  font-size: 22px;
+  background: #edf0ff;
+}
+
+.msq-subject-name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.msq-subject-name small {
+  display: block;
+  margin-top: 3px;
+  color: #7b8192;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.msq-chevron {
+  color: #777f93;
+  transition: transform .2s ease;
+}
+
+.msq-subject-toggle[aria-expanded="true"] .msq-chevron {
+  transform: rotate(180deg);
+}
+
+.msq-types {
+  display: none;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: 0 13px 14px;
+}
+
+.msq-types.msq-visible {
+  display: grid;
+}
+
+.msq-type-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-decoration: none;
+  color: #30384b;
+  background: #f4f5fa;
+  border: 1px solid #e9eaf2;
+  border-radius: 12px;
+  padding: 12px 13px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background .15s ease, transform .15s ease;
+}
+
+.msq-type-link:active {
+  transform: scale(.98);
+}
+
+.msq-type-link span:last-child {
+  color: #777f93;
+  font-size: 18px;
+}
+
+.msq-type-link.msq-mcq {
+  background: #eef2ff;
+  border-color: #dce3ff;
+}
+
+.msq-type-link.msq-short {
+  background: #eaf8f1;
+  border-color: #d7f0e3;
+}
+
+.msq-type-link.msq-long {
+  background: #fff3e8;
+  border-color: #ffe6d1;
+}
+
+.msq-note {
+  margin: 16px 2px 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #777f91;
+}
+
+#msqMainBtn {
+  position: relative;
+}
+
+#msqMainBtn .msq-nav-icon {
+  display: block;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+#msqMainBtn .msq-nav-label {
+  display: block;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+@media (min-width: 650px) {
+  #msqOverlay {
+    align-items: center;
+  }
+
+  .msq-panel {
+    border-radius: 25px;
+  }
+
+  .msq-types {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msq-panel {
+    animation: none;
+  }
+}
+</style>
 </head>
+
 <body>
 <div id="app">
-<header class="topbar">
-  <div><div class="eyebrow">BTEUP • प्रथम सेमेस्टर</div><h1>Mission Semester</h1></div>
-  <button class="iconbtn" id="themeBtn" aria-label="डार्क मोड">◐</button>
-</header>
-<main id="screen"></main>
-<nav class="bottomnav" aria-label="मुख्य मेनू">
-  <button data-route="home">⌂<span>होम</span></button>
-  <button data-route="timetable">▦<span>टाइमटेबल</span></button>
-  <button data-route="syllabus">▤<span>सिलेबस</span></button>
-  <button data-route="important">★<span>महत्वपूर्ण</span></button>
-  <button data-route="log">◷<span>स्टडी लॉग</span></button>
-</nav>
+
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">BTEUP • प्रथम सेमेस्टर</div>
+      <h1>Mission Semester</h1>
+    </div>
+    <button class="iconbtn" id="themeBtn" aria-label="डार्क मोड">◐</button>
+  </header>
+
+  <main id="screen"></main>
+
+  <nav class="bottomnav" aria-label="मुख्य मेनू">
+    <button data-route="home">⌂<span>होम</span></button>
+    <button data-route="timetable">▦<span>टाइमटेबल</span></button>
+    <button data-route="syllabus">▤<span>सिलेबस</span></button>
+    <button data-route="important">★<span>महत्वपूर्ण</span></button>
+
+    <!-- New Question Bank Button -->
+    <button type="button" id="msqMainBtn" aria-haspopup="dialog" aria-controls="msqOverlay">
+      <span class="msq-nav-icon">❓</span>
+      <span class="msq-nav-label">Ques.</span>
+    </button>
+
+    <button data-route="log">◷<span>स्टडी लॉग</span></button>
+  </nav>
+
 </div>
+
+<!-- Question Bank Popup -->
+<div id="msqOverlay" aria-hidden="true">
+  <section class="msq-panel" role="dialog" aria-modal="true" aria-labelledby="msqTitle">
+
+    <div class="msq-header">
+      <div>
+        <h2 id="msqTitle">Question Bank</h2>
+        <p>अपना विषय चुनें और प्रश्नों का अभ्यास करें।</p>
+      </div>
+      <button type="button" id="msqClose" aria-label="बंद करें">×</button>
+    </div>
+
+    <!-- MATHEMATICS -->
+    <article class="msq-subject">
+      <button class="msq-subject-toggle" type="button"
+        aria-expanded="false" aria-controls="msqMathTypes">
+        <span class="msq-subject-icon">📐</span>
+        <span class="msq-subject-name">
+          Mathematics-I
+          <small>गणित • MCQ, Short और Long</small>
+        </span>
+        <span class="msq-chevron">⌄</span>
+      </button>
+
+      <div class="msq-types" id="msqMathTypes">
+        <a class="msq-type-link msq-mcq" href="msq-math-objective-26.html">
+          <span>✓ MCQ Questions</span><span>→</span>
+        </a>
+        <a class="msq-type-link msq-short" href="msq-math-short-26.html">
+          <span>✎ Short Questions</span><span>→</span>
+        </a>
+        <a class="msq-type-link msq-long" href="msq-math-descriptive-26.html">
+          <span>▤ Long Questions</span><span>→</span>
+        </a>
+      </div>
+    </article>
+
+    <!-- PHYSICS -->
+    <article class="msq-subject">
+      <button class="msq-subject-toggle" type="button"
+        aria-expanded="false" aria-controls="msqPhysicsTypes">
+        <span class="msq-subject-icon">⚛️</span>
+        <span class="msq-subject-name">
+          Applied Physics-I
+          <small>भौतिक विज्ञान • MCQ, Short और Long</small>
+        </span>
+        <span class="msq-chevron">⌄</span>
+      </button>
+
+      <div class="msq-types" id="msqPhysicsTypes">
+        <a class="msq-type-link msq-mcq" href="msq-physics-objective-26.html">
+          <span>✓ MCQ Questions</span><span>→</span>
+        </a>
+        <a class="msq-type-link msq-short" href="msq-physics-short-26.html">
+          <span>✎ Short Questions</span><span>→</span>
+        </a>
+        <a class="msq-type-link msq-long" href="msq-physics-descriptive-26.html">
+          <span>▤ Long Questions</span><span>→</span>
+        </a>
+      </div>
+    </article>
+
+    <!-- CHEMISTRY -->
+    <article class="msq-subject">
+      <button class="msq-subject-toggle" type="button"
+        aria-expanded="false" aria-controls="msqChemTypes">
+        <span class="msq-subject-icon">🧪</span>
+        <span class="msq-subject-name">
+          Applied Chemistry
+          <small>रसायन विज्ञान • MCQ, Short और Long</small>
+        </span>
+        <span class="msq-chevron">⌄</span>
+      </button>
+
+      <div class="msq-types" id="msqChemTypes">
+        <a class="msq-type-link msq-mcq" href="msq-chem-objective-26.html">
+          <span>✓ MCQ Questions</span><span>→</span>
+        </a>
+        <a class="msq-type-link msq-short" href="msq-chem-short-26.html">
+          <span>✎ Short Questions</span><span>→</span>
+        </a>
+        <a class="msq-type-link msq-long" href="msq-chem-descriptive-26.html">
+          <span>▤ Long Questions</span><span>→</span>
+        </a>
+      </div>
+    </article>
+
+    <p class="msq-note">
+      प्रश्न खोलने के लिए ऊपर दिए गए विकल्प चुनें। यह मेनू बंद करने के लिए × दबाएँ या इसके बाहर टैप करें।
+    </p>
+
+  </section>
+</div>
+
 <script src="app.js"></script>
+
+<script>
+(function () {
+  const overlay = document.getElementById("msqOverlay");
+  const openBtn = document.getElementById("msqMainBtn");
+  const closeBtn = document.getElementById("msqClose");
+  const panel = overlay.querySelector(".msq-panel");
+
+  function openQuestions() {
+    overlay.classList.add("msq-open");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    closeBtn.focus();
+  }
+
+  function closeQuestions() {
+    overlay.classList.remove("msq-open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    openBtn.focus();
+  }
+
+  openBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    openQuestions();
+  });
+
+  closeBtn.addEventListener("click", closeQuestions);
+
+  overlay.addEventListener("click", function (event) {
+    if (event.target === overlay) closeQuestions();
+  });
+
+  panel.addEventListener("click", function (event) {
+    event.stopPropagation();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && overlay.classList.contains("msq-open")) {
+      closeQuestions();
+    }
+  });
+
+  document.querySelectorAll(".msq-subject-toggle").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const targetId = button.getAttribute("aria-controls");
+      const target = document.getElementById(targetId);
+      const willOpen = button.getAttribute("aria-expanded") !== "true";
+
+      button.setAttribute("aria-expanded", String(willOpen));
+      target.classList.toggle("msq-visible", willOpen);
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
