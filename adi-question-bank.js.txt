@@ -1,0 +1,43 @@
+(()=>{'use strict';
+const root=document.querySelector('.adi-qb-container');if(!root)return;
+const units=window.ADI_QUESTION_UNITS||[],cfg=window.ADI_QUESTION_CONFIG||{};
+const nav=document.getElementById('adiQbChapters'),list=document.getElementById('adiQbQuestions'),search=document.getElementById('adiQbSearch'),empty=document.getElementById('adiQbEmpty');
+const shown=document.getElementById('adiQbShown'),chapterTitle=document.getElementById('adiQbChapterTitle'),chapterCount=document.getElementById('adiQbChapterCount');
+let active='all',query='';
+const total=units.reduce((n,u)=>n+u.questions.length,0);
+document.getElementById('adiQbTotal').textContent=total;
+function makeNav(){
+ const all=document.createElement('button');all.className='adi-qb-chapter active';all.dataset.id='all';all.textContent='All Chapters';nav.append(all);
+ units.forEach((u,i)=>{const b=document.createElement('button');b.className='adi-qb-chapter';b.dataset.id=u.id;b.textContent=u.title.replace(/^(यूनिट|अध्याय)\s*\d+\s*:\s*/,'');nav.append(b)});
+ nav.addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(!b)return;active=b.dataset.id;nav.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));render()});
+}
+function render(){
+ const chosen=active==='all'?units:units.filter(u=>u.id===active);
+ const matches=[];
+ chosen.forEach(u=>u.questions.forEach(q=>{if(!query||q.text.toLocaleLowerCase().includes(query))matches.push({unit:u,q})}));
+ list.replaceChildren();
+ matches.forEach(({unit,q})=>{
+  const card=document.createElement('article');card.className='adi-qb-card';
+  const top=document.createElement('div');top.className='adi-qb-cardtop';
+  const no=document.createElement('span');no.className='adi-qb-number';no.textContent='QUESTION '+String(q.n||'').padStart(2,'0');
+  const copy=document.createElement('button');copy.className='adi-qb-copy';copy.type='button';copy.textContent='Copy Question';copy.addEventListener('click',()=>copyText(q.text));
+  top.append(no,copy);
+  const body=document.createElement('div');body.className='adi-qb-question';body.textContent=q.text;
+  card.append(top,body);list.append(card);
+ });
+ const selected=active==='all'?'All Chapters':(units.find(u=>u.id===active)?.title||'');
+ chapterTitle.textContent=selected.replace(/^(यूनिट|अध्याय)\s*\d+\s*:\s*/,'');
+ chapterCount.textContent=matches.length+' Questions';
+ shown.textContent=matches.length;
+ empty.hidden=matches.length!==0;list.hidden=matches.length===0;
+}
+function toast(msg){let t=document.querySelector('.adi-qb-toast');if(!t){t=document.createElement('div');t.className='adi-qb-toast';document.body.append(t)}t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),1700)}
+async function copyText(text){try{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);else{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.append(ta);ta.select();document.execCommand('copy');ta.remove()}toast('Question Copied!')}catch(e){toast('Copy failed. Please select the text.')}}
+search.addEventListener('input',()=>{query=search.value.trim().toLocaleLowerCase();render()});
+const themeBtn=document.querySelector('.adi-qb-theme');
+function setTheme(dark){root.classList.toggle('adi-qb-dark',dark);themeBtn.textContent=dark?'☼':'◐';try{localStorage.setItem('adi-qb-theme',dark?'dark':'light')}catch(e){}}
+let saved='light';try{saved=localStorage.getItem('adi-qb-theme')||'light'}catch(e){}setTheme(saved==='dark');
+themeBtn.addEventListener('click',()=>setTheme(!root.classList.contains('adi-qb-dark')));
+const topBtn=document.getElementById('adiQbTop');window.addEventListener('scroll',()=>topBtn.classList.toggle('visible',window.scrollY>350),{passive:true});topBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+makeNav();render();
+})();
